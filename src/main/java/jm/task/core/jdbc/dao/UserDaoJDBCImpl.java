@@ -2,6 +2,7 @@ package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
+import org.hibernate.JDBCException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,9 +11,14 @@ import java.util.List;
 public class UserDaoJDBCImpl implements UserDao   {
 
 
-    private  static final Connection connection = Util.getConnection(); //подключаемся к дб
-
-
+    private Connection connection = null;
+    {
+        try {
+            connection = Util.getConnection();
+        } catch (JDBCException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public UserDaoJDBCImpl() {
@@ -43,28 +49,35 @@ public class UserDaoJDBCImpl implements UserDao   {
         }
     }
 
-    public void saveUser(String name, String lastName, byte age) {
+    public void saveUser(String name, String lastName, byte age) throws SQLException {
         try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO newtable (name, lastname, age) Values (?, ?, ?)")) {
-
-
+            connection.setAutoCommit(false);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setInt(3, age);
             preparedStatement.executeUpdate();
+            connection.commit();
             System.out.println("Юзер с именем " + name +" добавлен");
         } catch (SQLException e) {
             System.out.println("Ошибка добавления юзера");
+            connection.rollback();
+        } finally {
+            connection.setAutoCommit(true);
         }
     }
 
-    public void removeUserById(long id) {
+    public void removeUserById(long id) throws SQLException {
         try (PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM newtable WHERE id = ?")) {
+            connection.setAutoCommit(false);
             preparedStatement.setInt(1, (int) id);
             preparedStatement.executeUpdate();
-
+            connection.commit();
             System.out.println("удалили юзера с id= " +id);
         } catch (SQLException e){
             System.out.println("ошибка удаления юзера");
+            connection.rollback();
+        } finally {
+            connection.setAutoCommit(true);
         }
     }
 
@@ -75,7 +88,6 @@ public class UserDaoJDBCImpl implements UserDao   {
                 User user = new User(resultSet.getString("name"), resultSet.getString("lastname"), resultSet.getByte("age"));
                 user.setId(resultSet.getLong("id"));
                 users.add(user);
-
             }
         } catch (SQLException e) {
             System.out.println("ошибка получения юзеров");
@@ -83,13 +95,17 @@ public class UserDaoJDBCImpl implements UserDao   {
         return users;
     }
 
-    public void cleanUsersTable() {
+    public void cleanUsersTable() throws SQLException {
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
             statement.executeUpdate("TRUNCATE TABLE newtable");
-
+            connection.commit();
             System.out.println("таблица очищена");
         } catch (SQLException e){
             System.out.println("ошибка отчистки таблицы");
+            connection.rollback();
+        } finally {
+            connection.setAutoCommit(true);
         }
 
     }
