@@ -10,11 +10,11 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     UserDao userDao = new UserDaoJDBCImpl();
-    public void createUsersTable() {
+    public void createUsersTable() throws SQLException {
         userDao.createUsersTable();
     }
 
-    public void dropUsersTable() {
+    public void dropUsersTable() throws SQLException {
         userDao.dropUsersTable();
     }
 
@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
         userDao.removeUserById(id);
     }
 
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers() throws SQLException {
         List<User> users = userDao.getAllUsers();
         for (User user : users) {
             System.out.println(user);
