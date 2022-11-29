@@ -26,7 +26,6 @@ public class Util {
         try {
             connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
             System.out.println("Подключились к бд в UTIL");
-
         } catch (SQLException e) {
             System.out.println("Не смогли подключиться к бд  в UTIL");
             e.printStackTrace();

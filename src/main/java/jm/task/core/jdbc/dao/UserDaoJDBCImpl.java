@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao   {
-
+    Connection connection = null;
 
     public UserDaoJDBCImpl() {   }
 
@@ -27,9 +27,10 @@ public class UserDaoJDBCImpl implements UserDao   {
         } catch (SQLException e) {
             System.out.println("Ошибка создания бд");
             e.printStackTrace();
-            Util.getConnection().rollback();
-        } finally {
-            Util.getConnection().setAutoCommit(true);
+            if (!connection.isClosed()) {
+                connection.rollback();
+            }
+
         }
     }
 
@@ -40,9 +41,9 @@ public class UserDaoJDBCImpl implements UserDao   {
             connection.commit();
         } catch (SQLException e) {
             System.out.println("Ошибка удаления таблицы");
-            Util.getConnection().rollback();
-        } finally {
-            Util.getConnection().setAutoCommit(true);
+            if (!connection.isClosed()) {
+                connection.rollback();
+            }
         }
     }
 
@@ -57,9 +58,9 @@ public class UserDaoJDBCImpl implements UserDao   {
             System.out.println("Юзер с именем " + name +" добавлен");
         } catch (SQLException e) {
             System.out.println("Ошибка добавления юзера");
-            Util.getConnection().rollback();
-        } finally {
-            Util.getConnection().setAutoCommit(true);
+            if (!connection.isClosed()) {
+                connection.rollback();
+            }
         }
     }
 
@@ -72,9 +73,9 @@ public class UserDaoJDBCImpl implements UserDao   {
             System.out.println("удалили юзера с id= " +id);
         } catch (SQLException e){
             System.out.println("ошибка удаления юзера");
-            Util.getConnection().rollback();
-        } finally {
-            Util.getConnection().setAutoCommit(true);
+            if (!connection.isClosed()) {
+                connection.rollback();
+            }
         }
     }
 
@@ -91,9 +92,9 @@ public class UserDaoJDBCImpl implements UserDao   {
             connection.commit();
         } catch (SQLException e) {
             System.out.println("ошибка получения юзеров");
-            Util.getConnection().rollback();
-        } finally {
-            Util.getConnection().setAutoCommit(true);
+            if (!connection.isClosed()) {
+                connection.rollback();
+            }
         }
         return users;
     }
@@ -106,9 +107,9 @@ public class UserDaoJDBCImpl implements UserDao   {
             System.out.println("таблица очищена");
         } catch (SQLException e){
             System.out.println("ошибка отчистки таблицы");
-            Util.getConnection().rollback();
-        } finally {
-            Util.getConnection().setAutoCommit(true);
+            if (!connection.isClosed()) {
+                connection.rollback();
+            }
         }
 
     }
